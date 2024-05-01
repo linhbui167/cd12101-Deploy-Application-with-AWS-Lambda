@@ -6,6 +6,12 @@
     "done": {
       "type": "boolean",
       "minLength": 1
+    },
+    "name": {
+      "type": "string"
+    },
+    "dueDate": {
+      "type": "string"
     }
   },
   "required": ["done"],

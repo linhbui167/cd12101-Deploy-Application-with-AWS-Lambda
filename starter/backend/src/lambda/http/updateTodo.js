@@ -22,7 +22,7 @@ export const handler = middy()
       event.headers.Authorization || event.headers.authorization
     const userId = parseUserId(authHeader)
     try {
-      logger.log('update Todo: ' + updatedTodo)
+      logger.log('update Todo: ', updatedTodo)
       const result = await updateTodo(userId, {
         ...updatedTodo,
         id: todoId,
