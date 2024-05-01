@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "group",
+  "type": "object",
+  "properties": {
+    "done": {
+      "type": "boolean",
+      "minLength": 1
+    }
+  },
+  "required": ["done"],
+  "additionalProperties": false
+}

@@ -18,80 +18,89 @@ import { NewTodoInput } from './NewTodoInput'
 
 export function Todos() {
   function renderTodos() {
-    if (loadingTodos) {
-      return renderLoading()
-    }
-
     return renderTodosList()
   }
 
   function renderTodosList() {
     return (
-      <Grid padded>
-        {todos.map((todo, pos) => {
-          return (
-            <Grid.Row key={todo.todoId}>
-              <Grid.Column width={1} verticalAlign="middle">
-                <Checkbox
-                  onChange={() => onTodoCheck(pos)}
-                  checked={todo.done}
-                />
-              </Grid.Column>
-              <Grid.Column width={10} verticalAlign="middle">
-                {todo.name}
-              </Grid.Column>
-              <Grid.Column width={3} floated="right">
-                {todo.dueDate}
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="blue"
-                  onClick={() => onEditButtonClick(todo.todoId)}
-                >
-                  <Icon name="pencil" />
-                </Button>
-              </Grid.Column>
-              <Grid.Column width={1} floated="right">
-                <Button
-                  icon
-                  color="red"
-                  onClick={() => onTodoDelete(todo.todoId)}
-                >
-                  <Icon name="delete" />
-                </Button>
-              </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
-              )}
-              <Grid.Column width={16}>
-                <Divider />
-              </Grid.Column>
-            </Grid.Row>
-          )
-        })}
-      </Grid>
+      <>
+        {loadingTodos && (
+          <div className="loading">
+            <Loader indeterminate active inline="centered">
+              Loading
+            </Loader>
+          </div>
+        )}
+        <Grid padded>
+          {todos.map((todo, pos) => {
+            return (
+              <Grid.Row key={todo.id}>
+                <Grid.Column width={1} verticalAlign="middle">
+                  <Checkbox
+                    onChange={() => onTodoCheck(pos)}
+                    checked={todo.done}
+                  />
+                </Grid.Column>
+                <Grid.Column width={10} verticalAlign="middle">
+                  {todo.name}
+                </Grid.Column>
+                <Grid.Column width={3} floated="right">
+                  {todo.dueDate}
+                </Grid.Column>
+                <Grid.Column width={1} floated="right">
+                  <Button
+                    icon
+                    color="blue"
+                    onClick={() => onEditButtonClick(todo.todoId)}
+                  >
+                    <Icon name="pencil" />
+                  </Button>
+                </Grid.Column>
+                <Grid.Column width={1} floated="right">
+                  <Button
+                    icon
+                    color="red"
+                    onClick={() => onTodoDelete(todo.todoId)}
+                  >
+                    <Icon name="delete" />
+                  </Button>
+                </Grid.Column>
+                {todo.attachmentUrl && (
+                  <Image src={todo.attachmentUrl} size="small" wrapped />
+                )}
+                <Grid.Column width={16}>
+                  <Divider />
+                </Grid.Column>
+              </Grid.Row>
+            )
+          })}
+        </Grid>
+      </>
     )
   }
 
   async function onTodoDelete(todoId) {
     try {
+      setLoadingTodos(true)
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
         scope: 'delete:todo'
       })
       await deleteTodo(accessToken, todoId)
       setTodos(todos.filter((todo) => todo.todoId !== todoId))
     } catch (e) {
       alert('Todo deletion failed')
+    } finally {
+      setLoadingTodos(false)
     }
   }
 
   async function onTodoCheck(pos) {
     try {
+      setLoadingTodos(true)
       const todo = todos[pos]
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
         scope: 'write:todo'
       })
       await patchTodo(accessToken, todo.todoId, {
@@ -107,6 +116,7 @@ export function Todos() {
     } catch (e) {
       console.log('Failed to check a TODO', e)
       alert('Todo deletion failed')
+      setLoadingTodos(false)
     }
   }
 
@@ -128,7 +138,7 @@ export function Todos() {
     async function foo() {
       try {
         const accessToken = await getAccessTokenSilently({
-          audience: `https://test-endpoint.auth0.com/api/v2/`,
+          audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
           scope: 'read:todos'
         })
         console.log('Access token: ' + accessToken)
@@ -146,7 +156,10 @@ export function Todos() {
     <div>
       <Header as="h1">TODOs</Header>
 
-      <NewTodoInput onNewTodo={(newTodo) => setTodos([...todos, newTodo])} />
+      <NewTodoInput
+        setLoadingTodos={setLoadingTodos}
+        onNewTodo={(newTodo) => setTodos([...todos, newTodo])}
+      />
 
       {renderTodos(loadingTodos, todos)}
     </div>
@@ -157,7 +170,7 @@ function renderLoading() {
   return (
     <Grid.Row>
       <Loader indeterminate active inline="centered">
-        Loading TODOs
+        Loading
       </Loader>
     </Grid.Row>
   )

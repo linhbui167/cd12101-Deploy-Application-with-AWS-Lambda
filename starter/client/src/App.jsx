@@ -38,7 +38,7 @@ export default function App() {
   }
 
   const { isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0()
-
+  console.log(isAuthenticated)
   return (
     <div>
       <Segment style={{ padding: '8em 0em' }} vertical>

@@ -4,15 +4,16 @@ import React, { useState } from 'react'
 import { Divider, Grid, Input } from 'semantic-ui-react'
 import { createTodo } from '../api/todos-api'
 
-export function NewTodoInput({ onNewTodo }) {
+export function NewTodoInput({ onNewTodo, setLoadingTodos }) {
   const [newTodoName, setNewTodoName] = useState('')
 
   const { getAccessTokenSilently } = useAuth0()
 
   const onTodoCreate = async (event) => {
     try {
+      setLoadingTodos(true)
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
         scope: 'write:todos'
       })
       const dueDate = calculateDueDate()
@@ -24,6 +25,8 @@ export function NewTodoInput({ onNewTodo }) {
     } catch (e) {
       console.log('Failed to created a new TODO', e)
       alert('Todo creation failed')
+    } finally {
+      setLoadingTodos(false)
     }
   }
 
