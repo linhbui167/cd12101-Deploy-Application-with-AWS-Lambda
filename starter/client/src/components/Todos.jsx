@@ -51,7 +51,7 @@ export function Todos() {
                   <Button
                     icon
                     color="blue"
-                    onClick={() => onEditButtonClick(todo.todoId)}
+                    onClick={() => onEditButtonClick(todo.id)}
                   >
                     <Icon name="pencil" />
                   </Button>
@@ -60,7 +60,7 @@ export function Todos() {
                   <Button
                     icon
                     color="red"
-                    onClick={() => onTodoDelete(todo.todoId)}
+                    onClick={() => onTodoDelete(todo.id)}
                   >
                     <Icon name="delete" />
                   </Button>
